@@ -2,10 +2,12 @@ import torch
 from transformers import DataCollatorForLanguageModeling
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from transformers import Trainer, TrainingArguments
+from transformers import LineByLineTextDataset
 from datasets import load_dataset
 
 def preprocess(dataset, tokenizer):
-    batch_encoding = tokenizer(dataset['text'], add_special_tokens=True, truncation=True, max_length=512)
+    lines = [line for line in dataset['text'] if (len(line) > 0 and not line.isspace())]
+    batch_encoding = tokenizer(lines, add_special_tokens=True, truncation=True, max_length=512)
     examples = batch_encoding["input_ids"]
     examples = [{"input_ids": torch.tensor(e, dtype=torch.long)} for e in examples]
     return examples
@@ -50,7 +52,7 @@ def train(model_name,
     trainer.train()
     trainer.save_model()
     eval_results = trainer.evaluate()
-    print(f"Perplexity: {torch.exp(eval_results['eval_loss']):.2f}")
+    print(f"Perplexity: {torch.exp(eval_results['eval_loss'])}")
 
 model_name = 'gpt2'
 output_dir = './ckpts/'

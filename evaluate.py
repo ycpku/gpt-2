@@ -12,7 +12,7 @@ model = GPT2LMHeadModel.from_pretrained(model_id).to(device)
 tokenizer = GPT2TokenizerFast.from_pretrained('gpt2')
 
 test = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")
-encodings = tokenizer("\n\n".join(test["text"]), return_tensors="pt")
+encodings = tokenizer(" ".join(test["text"]), return_tensors="pt")
 
 max_length = model.config.n_positions
 stride = 1024
