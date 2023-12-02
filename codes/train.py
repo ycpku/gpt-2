@@ -2,7 +2,6 @@ import torch
 from transformers import DataCollatorForLanguageModeling
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from transformers import Trainer, TrainingArguments
-from transformers import LineByLineTextDataset
 from datasets import load_dataset
 
 def preprocess(dataset, tokenizer):
@@ -18,21 +17,23 @@ def train(model_name,
           per_device_train_batch_size,
           num_train_epochs,
           save_steps):
-    tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-    tokenizer.save_pretrained(output_dir + "tokenizer")
+    # download pretrained tokenizer from Hugging Face
+    # tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+    # tokenizer.save_pretrained(output_dir + "tokenizer")
+    tokenizer = GPT2Tokenizer.from_pretrained(output_dir + "tokenizer")
     tokenizer.pad_token = tokenizer.eos_token
 
     wikitext_train = load_dataset("wikitext", "wikitext-2-raw-v1", split="train")
-    wikitext_test = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")
 
     train_dataset = preprocess(wikitext_train, tokenizer)
-    eval_dataset = preprocess(wikitext_test, tokenizer)
 
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
-    model = GPT2LMHeadModel.from_pretrained(model_name)
-    model.save_pretrained(output_dir + "pretrained")
-
+    # download pretrained tokenizer from Hugging Face
+    # model = GPT2LMHeadModel.from_pretrained(model_name)
+    # model.save_pretrained(output_dir + "pretrained")
+    model = GPT2LMHeadModel.from_pretrained(output_dir + "pretrained")
+    
     training_args = TrainingArguments(
             output_dir=output_dir,
             overwrite_output_dir=overwrite_output_dir,
@@ -45,14 +46,11 @@ def train(model_name,
             model=model,
             args=training_args,
             data_collator=data_collator,
-            eval_dataset=eval_dataset,
             train_dataset=train_dataset,
     )
 
     trainer.train()
     trainer.save_model()
-    eval_results = trainer.evaluate()
-    print(f"Perplexity: {torch.exp(eval_results['eval_loss'])}")
 
 model_name = 'gpt2'
 output_dir = './ckpts/'

@@ -6,13 +6,13 @@ from datasets import load_dataset
 device = "cuda"
 
 # model_id = "gpt2"
-model_id = "./ckpts/pretrained"
+model_id = "./ckpts"
 
 model = GPT2LMHeadModel.from_pretrained(model_id).to(device)
-tokenizer = GPT2TokenizerFast.from_pretrained('gpt2')
+tokenizer = GPT2TokenizerFast.from_pretrained('./ckpts/tokenizer')
 
 test = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")
-encodings = tokenizer(" ".join(test["text"]), return_tensors="pt")
+encodings = tokenizer("".join(test["text"]), return_tensors="pt")
 
 max_length = model.config.n_positions
 stride = 1024
@@ -43,5 +43,3 @@ for begin_loc in tqdm(range(0, seq_len, stride)):
 
 ppl = torch.exp(torch.stack(nlls).mean())
 print(ppl)
-
-# gpt2 tensor(29.9394, device='cuda:0') official:29.41

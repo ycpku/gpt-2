@@ -1,9 +1,9 @@
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 def generate_text(sequence, max_length):
-    model_path = "./ckpts/pretrained"
+    model_path = "./ckpts/checkpoint-4000"
     model = GPT2LMHeadModel.from_pretrained(model_path)
-    tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+    tokenizer = GPT2Tokenizer.from_pretrained('./ckpts/tokenizer')
     ids = tokenizer.encode(f'{sequence}', return_tensors='pt')
     final_outputs = model.generate(
         ids,
